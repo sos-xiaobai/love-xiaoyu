@@ -44,7 +44,33 @@
         </div>
     </div>
 
+    <!-- 右下角打字机文字 -->
+    <div id="typing-container">
+        <p id="typing-text"></p>
+    </div>
+
     <script type="text/javascript" src="js/love.js"></script>
+    <script>
+        // 打字机效果 - 在爱心动画结束后显示
+        const text = "小鱼，你是我的星辰大海\n愿意做我的唯一吗？";
+        const typingElement = document.getElementById("typing-text");
+        let typingIndex = 0;
+
+        function typeText() {
+            if (typingIndex < text.length) {
+                if (text[typingIndex] === '\n') {
+                    typingElement.innerHTML += '<br>'; // 换行符转换为 <br> 标签
+                } else {
+                    typingElement.innerHTML += text[typingIndex]; // 改用 innerHTML
+                }
+                typingIndex++;
+                setTimeout(typeText, 200);
+            }
+        }
+
+        // 延迟22秒后开始打字
+        setTimeout(typeText, 24000);
+    </script>
 
 </body>
 
