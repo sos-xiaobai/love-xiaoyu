@@ -184,4 +184,22 @@ body {
 }
 
 /*---------------------- footer -------------------------*/
+.top-image{
+    position: absolute; /* 从文档流中移除，不再推挤其他元素 */
+    top: 20px;          /* 根据需要调整位置 */
+    left: 20px;
+    z-index: 50;        /* 确保在上层，可根据需要增减 */
+    pointer-events: none; /* 若不需要交互，可避免阻塞点击 */
+}
+.top-image img{
+    display: block;
+    max-width: 120px; /* 根据需要调整大小 */
+    height: auto;
+}
+
+/* 可选：让主要容器居中且不被顶图挤压（若 container 默认是静态布局） */
+.container{
+    position: relative; /* 保持相对定位，方便内部绝对定位元素定位基准 */
+    z-index: 1;
+}
 
