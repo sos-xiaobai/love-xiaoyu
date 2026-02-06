@@ -57,68 +57,78 @@
 
     <script type="text/javascript" src="js/love.js"></script>
     <script>
-        // 打字机效果 - 参考 typewriter 插件
+    (function(){
+        const STORAGE_KEY = 'love_start_ts';
         const text = "小鱼\n你是我的星辰大海\n你愿意做我的唯一吗？";
-        const typingElement = document.getElementById("typing-text");
-        const buttonContainer = document.getElementById("button-container");
-        const messageText = document.getElementById("message-text");
-        const timerText = document.getElementById("timer-text");
-        const yesBtn = document.getElementById("yes-btn");
-        const noBtn = document.getElementById("no-btn");
+        const typingEl = document.getElementById('typing-text');
+        const buttonContainer = document.getElementById('button-container');
+        const messageEl = document.getElementById('message-text');
+        const timerEl = document.getElementById('timer-text');
+        const yesBtn = document.getElementById('yes-btn');
+        const noBtn = document.getElementById('no-btn');
+
         let typingIndex = 0;
-        let startTime = null;
         let timerInterval = null;
 
-        function typeText() {
-            if (typingIndex < text.length) {
-                let char = text[typingIndex];
-                if (char === '\n') {
-                    typingElement.innerHTML += '<br>';
-                } else {
-                    typingElement.innerHTML += char;
-                }
-                typingIndex++;
+        function formatTime(ms){
+            const totalSeconds = Math.floor(ms/1000);
+            const days = Math.floor(totalSeconds/86400);
+            const hours = Math.floor((totalSeconds%86400)/3600);
+            const minutes = Math.floor((totalSeconds%3600)/60);
+            const seconds = totalSeconds%60;
+            return `${days}天${hours}小时${minutes}分钟${seconds}秒`;
+        }
+
+        function startTimerFrom(ts){
+            if(timerInterval) clearInterval(timerInterval);
+            messageEl.style.display = 'block';
+            timerEl.style.display = 'inline-block';
+            function update(){
+                const elapsed = Date.now() - ts;
+                timerEl.textContent = formatTime(elapsed);
+            }
+            update();
+            timerInterval = setInterval(update, 1000);
+        }
+
+        function typeText(){
+            if(typingIndex < text.length){
+                const ch = text[typingIndex++];
+                if(ch === '\n') typingEl.innerHTML += '<br>';
+                else typingEl.innerHTML += ch;
                 setTimeout(typeText, 100);
             } else {
-                // 打字完成后显示按钮
                 buttonContainer.style.display = 'block';
             }
         }
 
-        function formatTime(ms) {
-            const totalSeconds = Math.floor(ms / 1000);
-            const days = Math.floor(totalSeconds / 86400);
-            const hours = Math.floor((totalSeconds % 86400) / 3600);
-            const minutes = Math.floor((totalSeconds % 3600) / 60);
-            const seconds = totalSeconds % 60;
-            return `${days}天${hours}小时${minutes}分钟${seconds}秒`;
-        }
-
-        function startTimer() {
-            startTime = Date.now();
-            timerInterval = setInterval(() => {
-                const elapsed = Date.now() - startTime;
-                timerText.textContent = formatTime(elapsed);
-            }, 1000);
-        }
-
-        // 愿意按钮
-        yesBtn.addEventListener('click', function() {
-            typingElement.style.display = 'none';
+        // 入口：如果已保存开始时间，直接显示计时；否则播放打字并显示按钮
+        let saved = localStorage.getItem(STORAGE_KEY);
+        // 强制重新打字：删除本地存储（发布前删除这一行）
+        localStorage.removeItem(STORAGE_KEY);
+        saved = null;
+        
+        if(saved){
+            typingEl.style.display = 'none';
             buttonContainer.style.display = 'none';
-            document.getElementById('message-text').style.display = 'block'; // 显示文字
-            timerText.style.display = 'block';
-            startTimer();
+            startTimerFrom(Number(saved));
+        } else {
+            // 根据你页面动画时长调整延迟（当前设为 24000ms）
+            setTimeout(typeText, 24000);
+        }
+
+        yesBtn.addEventListener('click', function(){
+            const now = Date.now();
+            localStorage.setItem(STORAGE_KEY, String(now));
+            typingEl.style.display = 'none';
+            buttonContainer.style.display = 'none';
+            startTimerFrom(now);
         });
 
-        // 不愿意按钮
-        noBtn.addEventListener('click', function() {
+        noBtn.addEventListener('click', function(){
             alert('那我就一直等你！');
-            // 可选：重置或其他操作
         });
-
-        // 延迟24秒后开始打字
-        setTimeout(typeText, 24000);
+    })();
     </script>
 
 </body>
